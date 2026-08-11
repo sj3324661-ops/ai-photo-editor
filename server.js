@@ -1,13 +1,13 @@
-const http = require("http");
+const express = require("express");
 
-const server = http.createServer((req, res) => {
-    res.writeHead(200, {
-        "Content-Type": "text/plain"
-    });
+const app = express();
 
-    res.end("AI Photo Editor API is running!");
+app.get("/", (req, res) => {
+    res.send("AI Photo Editor API is running!");
 });
 
-server.listen(3000, () => {
-    console.log("Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
