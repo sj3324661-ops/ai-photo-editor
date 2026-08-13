@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Daily Post Admin</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:
+        radial-gradient(circle at 20% 20%, #243b55 0%, transparent 35%),
+        radial-gradient(circle at 80% 80%, #1b0b3a 0%, transparent 35%),
+        linear-gradient(135deg, #050509, #101020, #050509);
+    color:white;
+    font-family:Arial,sans-serif;
+    min-height:100vh;
+}
+
+.container{
+    width:92%;
+    max-width:600px;
+    margin:25px auto;
+}
+
+h1{
+    text-align:center;
+}
+
+.box,
+.post{
+    background:#151525;
+    padding:20px;
+    border-radius:15px;
+    margin-top:20px;
+}
+
+input[type="text"],
+input[type="file"],
+textarea{
+    width:100%;
+    padding:13px;
+    margin-top:10px;
+    background:#242438;
+    color:white;
+    border:0;
+    border-radius:8px;
+    font-size:16px;
+}
+
+textarea{
+    min-height:150px;
+    resize:vertical;
+}
+
+.add-btn{
+    width:100%;
+    margin-top:20px;
+    padding:14px;
+    border:0;
+    border-radius:10px;
+    background:#4285f4;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.post img{
+    width:100%;
+    border-radius:10px;
+    display:block;
+}
+
+.post h3{
+    margin:15px 0 8px;
+    font-size:21px;
+}
+
+.post p{
+    color:#ccc;
+    line-height:1.5;
+    white-space:pre-wrap;
+}
+
+.menu-btn{
+    width:45px;
+    height:45px;
+    padding:0;
+    margin:10px 0 0 auto;
+    display:block;
+    background:#242438;
+    color:white;
+    border:0;
+    border-radius:50%;
+    font-size:26px;
+    font-weight:bold;
+}
+
+.post-menu{
+    margin-top:8px;
+    background:#242438;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.post-menu button{
+    width:100%;
+    padding:13px;
+    border:0;
+    background:transparent;
+    color:white;
+    font-size:16px;
+    text-align:left;
+}
+
+.post-menu button:hover{
+    background:#343450;
+}
+
+.logout-btn{
+    width:100%;
+    margin-top:20px;
+    padding:13px;
+    border:0;
+    border-radius:10px;
+    background:#e53935;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<script>
+
+if(
+    localStorage.getItem("adminLogin")
+    !== "true"
+){
+
+    window.location.href =
+        "login.html";
+
+}
+
+</script>
+
+
+<div class="container">
+
+
+<h1>🔐 Daily Post Admin</h1>
+
+
+<div class="box">
+
+
+<label>📌 Post Title</label>
+
+<input
+    type="text"
+    id="title"
+    placeholder="Post ke upar kya likhna hai?"
+>
+
+
+<label>📷 Photo Select Karo</label>
+
+<input
+    type="file"
+    id="photo"
+    accept="image/*"
+>
+
+
+<label>📝 Prompt</label>
+
+<textarea
+    id="prompt"
+    placeholder="Apna AI prompt yahan likho"
+></textarea>
+
+
+<button
+    class="add-btn"
+    onclick="addPost()">
+
+    ➕ Add Post
+
+</button>
+
+
+<button
+    class="logout-btn"
+    onclick="logout()">
+
+    🚪 Logout
+
+</button>
+
+
+</div>
+
+
+<h2>📚 Your Posts</h2>
+
+
+<div id="postList"></div>
+
+
+</div>
+
+
+<script>
+
+
+function getPosts(){
+
+    let data =
+        localStorage.getItem("dailyPosts");
+
+
+    if(!data){
+        return [];
+    }
+
+
+    try{
+
+        return JSON.parse(data);
+
+    }
+
+    catch(error){
+
+        return [];
+
+    }
+
+}
+
+
+
+function savePosts(posts){
+
+    localStorage.setItem(
+        "dailyPosts",
+        JSON.stringify(posts)
+    );
+
+}
+
+
+
+function addPost(){
+
+    let title =
+        document.getElementById(
+            "title"
+        ).value.trim();
+
+
+    let file =
+        document.getElementById(
+            "photo"
+        ).files[0];
+
+
+    let prompt =
+        document.getElementById(
+            "prompt"
+        ).value.trim();
+
+
+    if(!title){
+
+        alert(
+            "📌 Post Title likho."
+        );
+
+        return;
+
+    }
+
+
+    if(!file){
+
+        alert(
+            "📷 Pehle photo select karo."
+        );
+
+        return;
+
+    }
+
+
+    if(!prompt){
+
+        alert(
+            "📝 Prompt likho."
+        );
+
+        return;
+
+    }
+
+
+    let reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(){
+
+
+            let posts =
+                getPosts();
+
+
+            posts.push({
+
+                id:Date.now(),
+
+                title:title,
+
+                photo:reader.result,
+
+                prompt:prompt
+
+            });
+
+
+            savePosts(posts);
+
+
+            document.getElementById(
+                "title"
+            ).value = "";
+
+
+            document.getElementById(
+                "photo"
+            ).value = "";
+
+
+            document.getElementById(
+                "prompt"
+            ).value = "";
+
+
+            alert(
+                "✅ Post Add Ho Gayi!"
+            );
+
+
+            showPosts();
+
+        };
+
+
+    reader.readAsDataURL(file);
+
+}
+
+
+
+function toggleMenu(id){
+
+    let menu =
+        document.getElementById(
+            "menu-" + id
+        );
+
+
+    if(menu.style.display === "none"){
+
+        menu.style.display = "block";
+
+    }
+    else{
+
+        menu.style.display = "none";
+
+    }
+
+}
+
+
+
+function deletePost(id){
+
+    let answer =
+        confirm(
+            "Kya aap is Post ko delete karna chahte ho?"
+        );
+
+
+    if(!answer){
+
+        return;
+
+    }
+
+
+    let posts =
+        getPosts();
+
+
+    posts =
+        posts.filter(
+            function(post){
+
+                return post.id !== id;
+
+            }
+        );
+
+
+    savePosts(posts);
+
+
+    showPosts();
+
+}
+
+
+
+function editPost(id){
+
+    let posts =
+        getPosts();
+
+
+    let post =
+        posts.find(
+            function(item){
+
+                return item.id === id;
+
+            }
+        );
+
+
+    if(!post){
+
+        return;
+
+    }
+
+
+    let newTitle =
+        prompt(
+            "📌 Post Title:",
+            post.title
+        );
+
+
+    if(newTitle === null){
+
+        return;
+
+    }
+
+
+    let newPrompt =
+        prompt(
+            "📝 Prompt:",
+            post.prompt
+        );
+
+
+    if(newPrompt === null){
+
+        return;
+
+    }
+
+
+    post.title =
+        newTitle.trim();
+
+
+    post.prompt =
+        newPrompt.trim();
+
+
+    savePosts(posts);
+
+
+    showPosts();
+
+
+    alert(
+        "✅ Post update ho gayi!"
+    );
+
+}
+
+
+
+function showPosts(){
+
+    let posts =
+        getPosts();
+
+
+    let list =
+        document.getElementById(
+            "postList"
+        );
+
+
+    list.innerHTML = "";
+
+
+    posts
+    .slice()
+    .reverse()
+    .forEach(
+        function(post){
+
+
+            list.innerHTML += `
+
+            <div class="post">
+
+                <h3>
+                    ${post.title}
+                </h3>
+
+
+                <img
+                    src="${post.photo}"
+                    alt="Daily Post"
+                >
+
+
+                <p>
+                    ${post.prompt}
+                </p>
+
+
+                <button
+                    class="menu-btn"
+                    onclick="toggleMenu(${post.id})">
+
+                    ⋮
+
+                </button>
+
+
+                <div
+                    id="menu-${post.id}"
+                    class="post-menu"
+                    style="display:none;">
+
+                    <button
+                        onclick="editPost(${post.id})">
+
+                        ✏️ Edit
+
+                    </button>
+
+
+                    <button
+                        onclick="deletePost(${post.id})">
+
+                        🗑️ Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            `;
+
+        }
+    );
+
+}
+
+
+
+function logout(){
+
+    localStorage.removeItem(
+        "adminLogin"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+
+showPosts();
+
+</script>
+
+
+</body>
+
+  </html>
