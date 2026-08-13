@@ -119,7 +119,30 @@ header h1{
 <script>
 
 
-function getPosts(){
+async function getPosts(){
+
+    try{
+
+        const snapshot =
+            await db.collection("posts")
+            .orderBy("createdAt", "desc")
+            .get();
+
+        return snapshot.docs.map(function(doc){
+
+            return doc.data();
+
+        });
+
+    }catch(error){
+
+        console.error("Posts load error:", error);
+
+        return [];
+
+    }
+
+}
 
     let data =
         localStorage.getItem("dailyPosts");
