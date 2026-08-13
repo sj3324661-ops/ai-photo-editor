@@ -2,7 +2,6 @@
 <html lang="hi">
 
 <head>
-
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -53,42 +52,9 @@ header h1{
 }
 
 .post-title{
-    padding:18px 18px 10px;
+    padding:18px;
     font-size:22px;
     font-weight:bold;
-}
-
-.post img{
-    width:100%;
-    display:block;
-}
-
-.prompt{
-    padding:18px;
-}
-
-.prompt h3{
-    margin-top:0;
-}
-
-.prompt p{
-    color:#ccc;
-    line-height:1.5;
-    white-space:pre-wrap;
-}
-
-.create-btn{
-    display:block;
-    width:90%;
-    margin:auto;
-    padding:14px;
-    border-radius:10px;
-    background:#4285f4;
-    color:white;
-    font-size:18px;
-    font-weight:bold;
-    text-decoration:none;
-    text-align:center;
 }
 
 .no-post{
@@ -98,256 +64,138 @@ header h1{
     font-size:18px;
 }
 
+.error{
+    text-align:center;
+    color:#ff7777;
+    margin:50px 20px;
+}
+
 </style>
 
 </head>
 
-
 <body>
 
-
 <header>
-
-<h1>🔥 Daily AI Posts</h1>
-
+    <h1>🔥 Daily AI Posts</h1>
 </header>
 
+<div id="posts">
+    <div class="no-post">
+        ⏳ Posts load ho rahe hain...
+    </div>
+</div>
 
-<div id="posts"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 
 <script>
 
+const firebaseConfig = {
 
-async function getPosts(){
+    apiKey: "AIzaSyD5Fr_04TVEj5CqEiisM_-ThMQEJ9R1LM4",
+
+    authDomain: "daily-ai-posts.firebaseapp.com",
+
+    projectId: "daily-ai-posts",
+
+    storageBucket: "daily-ai-posts.firebasestorage.app",
+
+    messagingSenderId: "223242023213",
+
+    appId: "1:223242023213:web:e8e67fd7e587fe763323a4"
+
+};
+
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+
+async function loadPosts(){
+
+    const container =
+        document.getElementById("posts");
 
     try{
 
         const snapshot =
-            await db.collection("posts")
-            .orderBy("createdAt", "desc")
+            await db
+            .collection("posts")
             .get();
 
-        return snapshot.docs.map(function(doc){
 
-            return doc.data();
+        container.innerHTML = "";
+
+
+        if(snapshot.empty){
+
+            container.innerHTML = `
+                <div class="no-post">
+                    📭 Abhi koi post nahi hai.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        snapshot.forEach(function(doc){
+
+            const post =
+                doc.data();
+
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "post";
+
+
+            const title =
+                document.createElement("div");
+
+            title.className =
+                "post-title";
+
+
+            title.textContent =
+                "📌 " +
+                (post.title || "Daily AI Post");
+
+
+            box.appendChild(title);
+
+            container.appendChild(box);
 
         });
 
+
     }catch(error){
 
-        console.error("Posts load error:", error);
-
-        return [];
-
-    }
-
-}
-
-    let data =
-        localStorage.getItem("dailyPosts");
-
-
-    if(!data){
-
-        return [];
-
-    }
-
-
-    try{
-
-        return JSON.parse(data);
-
-    }
-
-    catch(error){
-
-        return [];
-
-    }
-
-}
-
-
-
-function showPosts(){
-
-    let posts =
-        getPosts();
-
-
-    let container =
-        document.getElementById("posts");
-
-
-    container.innerHTML = "";
-
-
-    if(posts.length === 0){
+        console.error(error);
 
         container.innerHTML = `
-
-        <div class="no-post">
-
-            📭 Abhi koi post nahi hai.
-
-        </div>
-
+            <div class="error">
+                ❌ Posts load नहीं हो पाए।
+            </div>
         `;
 
-        return;
-
     }
-
-
-    posts
-    .slice()
-    .reverse()
-    .forEach(function(post){
-
-
-        let box =
-            document.createElement("div");
-
-
-        box.className = "post";
-
-
-        /* POST TITLE */
-
-        let postTitle =
-            document.createElement("div");
-
-
-        postTitle.className =
-            "post-title";
-
-
-        postTitle.textContent =
-            "📌 " +
-            (post.title || "Daily AI Post");
-
-
-        /* PHOTO */
-
-        let image =
-            document.createElement("img");
-
-
-        image.src =
-            post.photo;
-
-
-        image.alt =
-            "Daily Post";
-
-
-        /* PROMPT */
-
-        let promptBox =
-            document.createElement("div");
-
-
-        promptBox.className =
-            "prompt";
-
-
-        let promptTitle =
-            document.createElement("h3");
-
-
-        promptTitle.textContent =
-            "📝 Prompt";
-
-
-        let text =
-            document.createElement("p");
-
-
-        text.textContent =
-            post.prompt;
-
-
-        /* CREATE */
-
-        let create =
-            document.createElement("a");
-
-
-        create.className =
-            "create-btn";
-
-
-        create.href =
-            "https://gemini.google.com/app?hl=en-IN";
-
-
-        create.target =
-            "_blank";
-
-
-        create.textContent =
-            "✨ CREATE";
-
-
-        /* ADD */
-
-        promptBox.appendChild(
-            promptTitle
-        );
-
-        promptBox.appendChild(
-            text
-        );
-
-
-        box.appendChild(
-            postTitle
-        );
-
-        box.appendChild(
-            image
-        );
-
-        box.appendChild(
-            promptBox
-        );
-
-        box.appendChild(
-            create
-        );
-
-
-        container.appendChild(
-            box
-        );
-
-    });
 
 }
 
 
-showPosts();
+loadPosts();
 
 </script>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyD5Fr_04TVEj5CqEiisM_-ThMQEJ9R1LM4",
-  authDomain: "daily-ai-posts.firebaseapp.com",
-  projectId: "daily-ai-posts",
-  storageBucket: "daily-ai-posts.firebasestorage.app",
-  messagingSenderId: "223242023213",
-  appId: "1:223242023213:web:e8e67fd7e587fe763323a4"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-</script>
 </body>
 
-</html> 
+</html>
