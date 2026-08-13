@@ -1,400 +1,315 @@
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Photo Editor</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Daily AI Posts</title>
 
 <style>
-* {
-    box-sizing: border-box;
+
+*{
+    box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    background: #0b0b12;
-    color: white;
-    font-family: Arial, sans-serif;
+body{
+    margin:0;
+    background:
+        radial-gradient(circle at 20% 20%, #243b55 0%, transparent 35%),
+        radial-gradient(circle at 80% 80%, #1b0b3a 0%, transparent 35%),
+        linear-gradient(135deg, #050509, #101020, #050509);
+    color:white;
+    font-family:Arial,sans-serif;
+    min-height:100vh;
 }
 
-.app {
-    width: 100%;
-    max-width: 500px;
-    margin: auto;
-    padding: 20px;
+header{
+    padding:20px;
+    text-align:center;
+    background:#151525;
 }
 
-h1 {
-    text-align: center;
-    margin: 10px 0 5px;
+header h1{
+    margin:0;
+    font-size:26px;
 }
 
-.subtitle {
-    text-align: center;
-    color: #999;
-    margin-bottom: 20px;
+#posts{
+    padding-bottom:30px;
 }
 
-.photo-area {
-    width: 100%;
-    height: 350px;
-    background: #171720;
-    border: 2px dashed #555;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+.post{
+    width:92%;
+    max-width:600px;
+    margin:25px auto;
+    background:#151525;
+    border-radius:15px;
+    overflow:hidden;
+    padding-bottom:20px;
 }
 
-#photoPreview {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: none;
+.post-title{
+    padding:18px 18px 10px;
+    font-size:22px;
+    font-weight:bold;
 }
 
-#photoText {
-    text-align: center;
-    color: #888;
-    font-size: 18px;
+.post img{
+    width:100%;
+    display:block;
 }
 
-.upload-button {
-    display: block;
-    width: 100%;
-    padding: 16px;
-    margin-top: 15px;
-    background: #292936;
-    color: white;
-    text-align: center;
-    border-radius: 12px;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
+.prompt{
+    padding:18px;
 }
 
-#photoInput {
-    display: none;
+.prompt h3{
+    margin-top:0;
 }
 
-label {
-    display: block;
-    margin-top: 20px;
-    margin-bottom: 8px;
-    font-weight: bold;
+.prompt p{
+    color:#ccc;
+    line-height:1.5;
+    white-space:pre-wrap;
 }
 
-#prompt {
-    width: 100%;
-    height: 120px;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid #444;
-    background: #171720;
-    color: white;
-    font-size: 16px;
-    resize: none;
+.create-btn{
+    display:block;
+    width:90%;
+    margin:auto;
+    padding:14px;
+    border-radius:10px;
+    background:#4285f4;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    text-decoration:none;
+    text-align:center;
 }
 
-#prompt::placeholder {
-    color: #777;
+.no-post{
+    text-align:center;
+    color:#aaa;
+    margin-top:50px;
+    font-size:18px;
 }
 
-#editButton {
-    width: 100%;
-    padding: 17px;
-    margin-top: 15px;
-    border: 0;
-    border-radius: 12px;
-    background: #704cff;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#editButton:disabled {
-    opacity: 0.6;
-}
-
-#status {
-    text-align: center;
-    color: #aaa;
-    margin-top: 15px;
-    min-height: 24px;
-}
-
-#resultArea {
-    margin-top: 20px;
-    display: none;
-}
-
-#resultImage {
-    width: 100%;
-    max-height: 500px;
-    object-fit: contain;
-    border-radius: 20px;
-}
-
-.download-button {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    margin-top: 12px;
-    background: #19b36b;
-    color: white;
-    text-decoration: none;
-    text-align: center;
-    border-radius: 12px;
-    font-weight: bold;
-}
 </style>
+
 </head>
+
 
 <body>
 
-<div class="app">
 
-    <h1>✨ AI Photo Editor</h1>
+<header>
 
-    <div class="subtitle">
-        अपनी फोटो को AI से Edit करें
-    </div>
+<h1>🔥 Daily AI Posts</h1>
 
-    <div class="photo-area">
+</header>
 
-        <div id="photoText">
-            📷<br><br>
-            यहाँ आपकी फोटो दिखाई देगी
-        </div>
 
-        <img id="photoPreview" alt="Photo Preview">
+<div id="posts"></div>
 
-    </div>
-
-    <label for="photoInput" class="upload-button">
-        📷 फोटो चुनें
-    </label>
-
-    <input
-        id="photoInput"
-        type="file"
-        accept="image/*"
-    >
-
-    <label>
-        📝 Photo Edit Prompt
-    </label>
-
-    <textarea
-        id="prompt"
-        placeholder="उदाहरण:
-
-Background को पहाड़ों में बदल दो
-या
-फोटो को cinematic बना दो"></textarea>
-
-    <button id="editButton">
-        ✨ AI Photo Edit
-    </button>
-
-    <div id="status"></div>
-
-    <div id="resultArea">
-
-        <img
-            id="resultImage"
-            alt="Edited Photo"
-        >
-
-        <a
-            id="downloadButton"
-            class="download-button"
-            download="ai-edited-photo.png"
-        >
-            ⬇️ Edited Photo Save करें
-        </a>
-
-    </div>
-
-</div>
 
 <script>
 
-const photoInput = document.getElementById("photoInput");
-const photoPreview = document.getElementById("photoPreview");
-const photoText = document.getElementById("photoText");
-const editButton = document.getElementById("editButton");
-const prompt = document.getElementById("prompt");
-const status = document.getElementById("status");
 
-const resultArea = document.getElementById("resultArea");
-const resultImage = document.getElementById("resultImage");
-const downloadButton = document.getElementById("downloadButton");
+function getPosts(){
 
-const WORKER_URL =
-    "https://dawn-limit-babb.binduparsadbinduparsad3.workers.dev";
+    let data =
+        localStorage.getItem("dailyPosts");
 
 
-/* =========================
-   PHOTO SELECT
-========================= */
+    if(!data){
 
-photoInput.addEventListener("change", function () {
+        return [];
 
-    const file = this.files[0];
-
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-
-        photoPreview.src = event.target.result;
-
-        photoPreview.style.display = "block";
-
-        photoText.style.display = "none";
-
-        resultArea.style.display = "none";
-
-        status.innerText =
-            "✅ फोटो चुन ली गई है";
-
-    };
-
-    reader.readAsDataURL(file);
-
-});
-
-
-/* =========================
-   AI EDIT BUTTON
-========================= */
-
-editButton.addEventListener("click", async function () {
-
-    const file = photoInput.files[0];
-
-    const text = prompt.value.trim();
-
-
-    if (!file) {
-
-        alert("पहले फोटो चुनें 📷");
-
-        return;
     }
 
 
-    if (!text) {
+    try{
 
-        alert("पहले Prompt लिखें 📝");
+        return JSON.parse(data);
+
+    }
+
+    catch(error){
+
+        return [];
+
+    }
+
+}
+
+
+
+function showPosts(){
+
+    let posts =
+        getPosts();
+
+
+    let container =
+        document.getElementById("posts");
+
+
+    container.innerHTML = "";
+
+
+    if(posts.length === 0){
+
+        container.innerHTML = `
+
+        <div class="no-post">
+
+            📭 Abhi koi post nahi hai.
+
+        </div>
+
+        `;
 
         return;
+
     }
 
 
-    editButton.disabled = true;
-
-    status.innerText =
-        "🔄 फोटो API को भेजी जा रही है...";
-
-
-    try {
-
-        const formData = new FormData();
-
-        formData.append("image", file);
-
-        formData.append("prompt", text);
+    posts
+    .slice()
+    .reverse()
+    .forEach(function(post){
 
 
-        const response = await fetch(WORKER_URL, {
-
-            method: "POST",
-
-            body: formData
-
-        });
+        let box =
+            document.createElement("div");
 
 
-        const data = await response.json();
+        box.className = "post";
 
 
-        if (!response.ok) {
+        /* POST TITLE */
 
-            throw new Error(
-                data.error || "API connection failed"
-            );
-
-        }
+        let postTitle =
+            document.createElement("div");
 
 
-        console.log(
-            "API Response:",
-            data
+        postTitle.className =
+            "post-title";
+
+
+        postTitle.textContent =
+            "📌 " +
+            (post.title || "Daily AI Post");
+
+
+        /* PHOTO */
+
+        let image =
+            document.createElement("img");
+
+
+        image.src =
+            post.photo;
+
+
+        image.alt =
+            "Daily Post";
+
+
+        /* PROMPT */
+
+        let promptBox =
+            document.createElement("div");
+
+
+        promptBox.className =
+            "prompt";
+
+
+        let promptTitle =
+            document.createElement("h3");
+
+
+        promptTitle.textContent =
+            "📝 Prompt";
+
+
+        let text =
+            document.createElement("p");
+
+
+        text.textContent =
+            post.prompt;
+
+
+        /* CREATE */
+
+        let create =
+            document.createElement("a");
+
+
+        create.className =
+            "create-btn";
+
+
+        create.href =
+            "https://gemini.google.com/app?hl=en-IN";
+
+
+        create.target =
+            "_blank";
+
+
+        create.textContent =
+            "✨ CREATE";
+
+
+        /* ADD */
+
+        promptBox.appendChild(
+            promptTitle
+        );
+
+        promptBox.appendChild(
+            text
         );
 
 
-        /*
-         API से आने वाली image को अलग-अलग
-         possible response formats से पढ़ना
-        */
+        box.appendChild(
+            postTitle
+        );
 
-        let imageUrl = null;
+        box.appendChild(
+            image
+        );
 
+        box.appendChild(
+            promptBox
+        );
 
-        if (data.image_url) {
-
-            imageUrl = data.image_url;
-
-        } else if (data.imageUrl) {
-
-            imageUrl = data.imageUrl;
-
-        } else if (data.url) {
-
-            imageUrl = data.url;
-
-        } else if (data.image) {
-
-            imageUrl = data.image;
-
-        } else if (data.output) {
-
-            imageUrl = data.output;
-
-        }
+        box.appendChild(
+            create
+        );
 
 
-        if (!imageUrl) {
+        container.appendChild(
+            box
+        );
 
-            status.innerText =
-                "✅ API ने response दिया।";
+    });
 
-            console.log(
-                "पूरा API response:",
-                data
-            );
-
-        } else {
-
-            resultImage.src = imageUrl;
-
-            resultArea.style.display = "block";
-
-            downloadButton.href = imageUrl;
-
-            status.innerText =
-                "✅ AI Photo Edit पूरी हो गई!";
-
-        }
+}
 
 
-    } catch (error) {
+showPosts();
 
-        console.error(error);
+</script>
 
-        status.innerText =
+
+</body>
+
+</html> 
